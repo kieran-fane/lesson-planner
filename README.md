@@ -63,7 +63,7 @@ The frontend is a React application using Material UI (MUI) components. It fetch
 
 1. Obtain an API key from [OpenAI](https://platform.openai.com/) (requires an account).
 2. In the `frontend` directory, create a `.env` file containing:
-    ```
+    ```.env
     VITE_OPENAI_API_KEY=<your_api_key_here>
     ```
 3. Save the file. The frontend can now access the OpenAI API, enabling all AI-related functionality.
