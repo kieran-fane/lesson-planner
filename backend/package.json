@@ -1,0 +1,36 @@
+{
+  "name": "ai-lesson-planner-backend",
+  "type": "module",
+  "version": "3.0.0",
+  "description": "AI Lesson Planner - Backend",
+  "author": "Kieran Fane",
+  "license": "UNLICENSED",
+  "repository": "none",
+  "devDependencies": {
+    "@vitest/coverage-v8": "*",
+    "eslint": "*",
+    "eslint-config-google": "*",
+    "eslint-plugin-jsdoc": "*", 
+    "globals": "8",
+    "nodemon": "*",
+    "strip-comments": "*",
+    "supertest": "*",
+    "vitest": "*",
+    "vite-plugin-eslint": "*"
+  },
+  "dependencies": {
+    "cors": "*",
+    "dotenv": "*",
+    "express": "*",
+    "express-openapi-validator": "*",
+    "js-yaml": "*",
+    "jsonwebtoken": "*",
+    "pg": "*",
+    "swagger-ui-express": "*"
+  },
+  "scripts": {
+    "lint": "eslint src test --no-inline-config --max-warnings 0",
+    "start": "nodemon src/server.js",
+    "test": "vitest run --no-file-parallelism --testTimeout=2000 --coverage"
+  }
+}
