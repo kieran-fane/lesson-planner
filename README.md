@@ -68,6 +68,5 @@ The frontend is a React application using Material UI (MUI) components. It fetch
     ```
 3. Save the file. The frontend can now access the OpenAI API, enabling all AI-related functionality.
 
-You should now be able to run and test the Full-Stack React AI Lesson Planner locally. If you encounter any issues, please open an issue or refer to the documentation in the respective directories.
-
 ---
+You should now be able to run and test the Full-Stack React AI Lesson Planner locally. If you encounter any issues, please open an issue or refer to the documentation in the respective directories.
