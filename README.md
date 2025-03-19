@@ -1,7 +1,7 @@
 # Full-Stack React AI Lesson Planner
 
 ## Getting Started
-
+---
 ### Prerequisites
 
 Please ensure the following software is installed on your system:
@@ -11,7 +11,7 @@ Please ensure the following software is installed on your system:
 3. [Docker Desktop](https://www.docker.com/get-started/)
 
 > **Note:** After installation, you may need to restart your computer for the changes to take effect.
-
+---
 ### Cloning the Repository and Installing Dependencies
 
 1. **Clone this repository** (or download the ZIP) and open it in your desired location.
@@ -27,7 +27,7 @@ Please ensure the following software is installed on your system:
     ~~~
 
 > **Note:** Installing all packages will take a while, I recommend running both at the same time in different terminals.
-
+---
 ### Running the Backend
 
 The backend is an Express.js server (with OpenAPI validation) that connects to a PostgreSQL database in a Docker container.
@@ -47,7 +47,7 @@ The backend is an Express.js server (with OpenAPI validation) that connects to a
    - A Swagger UI for testing endpoints is available at **http://localhost:3010**.
 
 > For additional information or troubleshooting, please see the `README` in the `backend` directory.
-
+---
 ### Running the Frontend
 
 The frontend is a React application using Material UI (MUI) components. It fetches data from the backend and integrates with ChatGPT’s API.
@@ -58,7 +58,7 @@ The frontend is a React application using Material UI (MUI) components. It fetch
     npm run dev
     ~~~
 3. Open **http://localhost:3000** in your web browser to view the application.
-
+---
 #### Connecting to OpenAI’s API
 
 1. Obtain an API key from [OpenAI](https://platform.openai.com/) (requires an account).
