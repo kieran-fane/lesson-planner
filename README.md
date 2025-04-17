@@ -36,7 +36,7 @@ The backend is an Express.js server (with OpenAPI validation) that connects to a
 2. Ensure **port 5432** is free. If you have a locally installed PostgreSQL using port 5432, stop it or change its port.
 3. In the `backend` folder, rename `.env-sample` to `.env`.
    - This is for demo purposes only; change credentials for production.
-4. Build and run the Postgres container:
+4. Build and run the Postgres container (navigate to the backend directory):
     ~~~sh
     docker-compose up -d
     ~~~
@@ -47,6 +47,9 @@ The backend is an Express.js server (with OpenAPI validation) that connects to a
    - A Swagger UI for testing endpoints is available at **http://localhost:3010**.
 
 > For additional information or troubleshooting, please see the `README` in the `backend` directory.
+
+Be sure to run ```docker-compose down``` when done with backend. This will clean up and close the containerized memory. 
+
 ---
 ### Running the Frontend
 
