@@ -5,7 +5,6 @@ import {ThemeProvider} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import React from 'react';
 import {Grid2, AppBar, Toolbar, Typography} from '@mui/material';
-import TranscriptExtractor from './TranscriptExtractor';
 import theme from './theme.js';
 import LessonsList from './LessonsList.jsx';
 import LessonCreator from './LessonCreator.jsx';
@@ -55,7 +54,6 @@ function App() {
             <LessonsList />
           </Grid2>
         </Grid2>
-        <TranscriptExtractor/>
         <LessonCreator />
       </Context.Provider>
     </ThemeProvider>

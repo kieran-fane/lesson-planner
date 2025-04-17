@@ -4,6 +4,7 @@ import {Box, Tabs, Tab, Typography, Paper,
 import Context from './appContext';
 
 const fetchOpenAIContent = async (transcriptText) => {
+  console.log('Fetch OpenAI Content');
   try {
     const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     if (!apiKey) {
@@ -51,13 +52,30 @@ const fetchOpenAIContent = async (transcriptText) => {
     });
 
     if (!response.ok) {
+      const text = await response.text().catch(() => '<could not read body>');
+      console.error('OpenAI API returned non-OK:',
+          {
+            status: response.status,
+            statusText: response.statusText,
+            headers: [...response.headers.entries()],
+            body: text,
+          },
+      );
       throw new Error(`OpenAI API error: ${response.status}`);
     }
     const data = await response.json();
     const content = data.choices[0].message.content;
     return {content};
   } catch (error) {
-    console.error('Error fetching OpenAI content:', error);
+    console.error('Error fetching OpenAI content:', {
+      message: error.message,
+      stack: error.stack,
+      // if you ever wrap a fetch exception that has no “response” itself,
+      // you’ll see it here
+      original: error,
+    });
+    // re‑throw if you want to let a boundary catch it, or
+    // return something so your UI can handle it gracefully:
     return {content: ''};
   }
 };

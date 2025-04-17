@@ -6,7 +6,7 @@ import {Card, CardContent, Typography,
   Paper, CircularProgress} from '@mui/material';
 import {styled} from '@mui/material/styles';
 import Context from './appContext';
-
+import {transcribeVideoFile} from './util/transcribe.js';
 
 const FileInput = styled('input')({
   display: 'none',
@@ -17,9 +17,10 @@ const FileInput = styled('input')({
  * @returns {object} JSX
  */
 function VideoUpload() {
-  const {videoFile, setVideoFile,
-    transcript, transcriptLoading, videoId, setVideoId,
+  const {videoFile, setVideoFile, setTranscriptLoading, setFetchAI,
+    transcript, setTranscript, transcriptLoading, videoId, setVideoId,
   } = React.useContext(Context);
+
   const [previewURL, setPreviewURL] = useState(null);
 
   useEffect(() => {
@@ -45,6 +46,14 @@ function VideoUpload() {
         // Store preview URL inside the object
       });
       setVideoId(null);
+
+      transcribeVideoFile(file,
+          {
+            setTranscriptLoading,
+            setVideoId,
+            setTranscript,
+            setFetchAI,
+          });
     }
   }, []);
 

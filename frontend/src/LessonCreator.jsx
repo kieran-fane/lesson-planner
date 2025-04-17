@@ -8,7 +8,6 @@ import Context from './appContext';
 function LessonCreator() {
   const {videoFile, videoId, transcript,
     lessonData, setLessons} = useContext(Context);
-    // lessons
   useEffect(() => {
     if (!videoId || !transcript || !lessonData) return;
 
@@ -33,11 +32,9 @@ function LessonCreator() {
 
         if (!response.ok) throw new Error('Failed to save lesson');
         const savedLesson = await response.json();
-        // console.log('svd ', savedLesson);
         // Update lessons list with the new lesson
         setLessons((prev) => [...prev, {id: savedLesson.lessonId,
           data: lesson}]);
-        // console.log('Lessons after', lessons);
       } catch (error) {
         console.error('Error saving lesson:', error);
       }

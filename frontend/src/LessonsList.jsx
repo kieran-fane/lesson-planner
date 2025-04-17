@@ -11,19 +11,15 @@ import Context from './appContext';
 function LessonsList() {
   const {setVideoFile, setTranscript, setLessonData,
     setVideoId, setFetchAI, lessons, setLessons} = useContext(Context);
-  // const [lessons, setLessons] = useState([]);
 
   useEffect(() => {
     /**
-     *
+     * Gets the lessons
      */
     async function fetchLessons() {
       const response = await fetch('http://localhost:3010/api/v0/lesson');
-      // console.log(response);
       const data = await response.json();
-      // console.log('IN FETCH ', data.lesson);
       setLessons(data.lessons);
-      // .then((data) => setLessons(data))
     }
     fetchLessons();
   }, []);
@@ -42,7 +38,6 @@ function LessonsList() {
       });
       setFetchAI(false);
       setTranscript(lR.lesson.data.transcript);
-      // console.log(lR);
 
       setVideoFile({id: lR.lesson.videoId, previewURL: null});
     } catch (error) {
