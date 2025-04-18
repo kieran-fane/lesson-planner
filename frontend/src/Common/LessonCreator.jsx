@@ -1,5 +1,5 @@
 import {useEffect, useContext} from 'react';
-import Context from './appContext';
+import Context from '../appContext';
 
 /**
  * The code to handle updating the backend after lesson created

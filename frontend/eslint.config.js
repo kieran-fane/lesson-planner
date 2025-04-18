@@ -1,51 +1,19 @@
-import google from 'eslint-config-google';
-delete google.rules['valid-jsdoc'];
-delete google.rules['require-jsdoc'];
-
-import jsdoc from 'eslint-plugin-jsdoc';
-import globals from 'globals';
-import js from '@eslint/js';
-import react from 'eslint-plugin-react';
-import reactHooks from 'eslint-plugin-react-hooks';
-delete reactHooks.configs.recommended.rules['react-hooks/exhaustive-deps'];
-import {fixupPluginRules} from '@eslint/compat';
+import js from "@eslint/js";
+import react from "eslint-plugin-react";
 
 export default [
-  google,
+  // 1. Core “eslint:recommended” rules
   js.configs.recommended,
-  jsdoc.configs['flat/recommended'],
-  react.configs.flat.recommended,
-  // react.configs.flat.all,
-  react.configs.flat['jsx-runtime'], // For React 17+
+
+  // 2. React’s flat‑config “recommended” rules
+  react.configs.flat.recommended,    // JSX‑specific
+  react.configs.flat["jsx-runtime"], // React 17+ runtime
+
+  // 3. React version detection for plugin rules
   {
     settings: {
       react: {
-        version: 'detect',
-      },
-    },
-  },
-  {
-    files: ['src/**/*.jsx'],
-    ignores: ['coverage/'],
-    plugins: {
-      jsdoc,
-      react,
-      'react-hooks': fixupPluginRules(reactHooks),
-    },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
-    },
-    languageOptions: {
-      ...react.configs.flat.recommended.languageOptions,
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-      ecmaVersion: 2024,
-      sourceType: 'module',
-      globals: {
-        ...globals.browser,
+        version: "detect",
       },
     },
   },

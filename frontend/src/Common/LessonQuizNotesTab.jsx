@@ -1,7 +1,7 @@
 import React from 'react';
 import {Box, Tabs, Tab, Typography, Paper,
   CircularProgress} from '@mui/material';
-import Context from './appContext';
+import Context from '../appContext';
 
 const fetchOpenAIContent = async (transcriptText) => {
   console.log('Fetch OpenAI Content');

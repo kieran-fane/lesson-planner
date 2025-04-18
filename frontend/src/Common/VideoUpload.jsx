@@ -5,8 +5,8 @@ import {Card, CardContent, Typography,
   CardMedia,
   Paper, CircularProgress} from '@mui/material';
 import {styled} from '@mui/material/styles';
-import Context from './appContext';
-import {transcribeVideoFile} from './util/transcribe.js';
+import Context from '../appContext';
+import {transcribeVideoFile} from '../util/transcribe.js';
 
 const FileInput = styled('input')({
   display: 'none',
@@ -75,7 +75,7 @@ function VideoUpload() {
   });
 
   return (
-    <Card sx={{width: '40vw',
+    <Card sx={{// width: '40vw',
       boxShadow: 3,
       borderRadius: 2,
       height: '100%'}}>

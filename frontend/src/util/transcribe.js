@@ -1,4 +1,4 @@
-/* eslint-disable no-undef, max-len, jsdoc/no-undefined-types */
+/* eslint-disable no-undef */
 /* eslint-env browser */
 
 /**

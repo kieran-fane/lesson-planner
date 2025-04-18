@@ -1,6 +1,6 @@
 import {useEffect, useContext} from 'react';
 import {Box, List, ListItem, Typography, Button} from '@mui/material';
-import Context from './appContext';
+import Context from '../appContext';
 
 // TODO FIX THE previewURL so that it works with switching videos
 
