@@ -147,7 +147,7 @@ function LessonQuizNotesTabs() {
   };
 
   return (
-    <Paper sx={{width: '40vw', height: '100%'}}>
+    <Paper sx={{width: '100%', minWidth: '40vw', height: '100%', display:'flex'}}>
       <Box sx={{width: '100%', mt: 2, margin: 0}}>
         <Tabs value={activeTab} onChange={handleTabChange} centered>
           <Tab label="Lesson Plan" />

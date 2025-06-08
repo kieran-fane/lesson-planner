@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid2, AppBar, Toolbar, Typography, Box } from '@mui/material';
+import { Grid, AppBar, Toolbar, Typography, Box } from '@mui/material';
 import VideoUpload         from '../Common/VideoUpload';
 import LessonQuizNotesTab from '../Common/LessonQuizNotesTab';
 import LessonsList         from '../Common/LessonsList';
@@ -15,16 +15,16 @@ export default function WideLayout() {
       </AppBar>
 
       <Box sx={{ mt: '64px', px: 4, maxWidth: 1600, mx: 'auto' }}>
-        <Grid2
+        <Grid
           container
-          spacing={4}
+          spacing={2}
           direction="row"
           justifyContent="space-between"
         >
-          <Grid2 item xs={12} md={3}><VideoUpload /></Grid2>
-          <Grid2 item xs={12} md={6}><LessonQuizNotesTab /></Grid2>
-          <Grid2 item xs={12} md={3}><LessonsList /></Grid2>
-        </Grid2>
+          <Grid item xs={12} md={3}><VideoUpload /></Grid>
+          <Grid item xs={12} md={3}><LessonQuizNotesTab /></Grid>
+          <Grid item xs={12} md={3}><LessonsList /></Grid>
+        </Grid>
       </Box>
 
       <LessonCreator />

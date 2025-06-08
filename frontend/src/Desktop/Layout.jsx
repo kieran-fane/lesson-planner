@@ -1,5 +1,5 @@
 import React from 'react';
-import {Grid2, AppBar, Toolbar, Typography} from '@mui/material';
+import {Grid, AppBar, Toolbar, Typography} from '@mui/material';
 import VideoUpload         from '../Common/VideoUpload';
 import LessonQuizNotesTab from '../Common/LessonQuizNotesTab';
 import LessonsList         from '../Common/LessonsList';
@@ -14,17 +14,17 @@ export default function DesktopLayout() {
         </Toolbar>
       </AppBar>
 
-      <Grid2
+      <Grid
         container
         spacing={2}
         direction="row"
         justifyContent="center"
         sx={{ mt: '64px' }}
       >
-        <Grid2 item xs={12} md={4}><VideoUpload /></Grid2>
-        <Grid2 item xs={12} md={6}><LessonQuizNotesTab /></Grid2>
-        <Grid2 item xs={12} md={2}><LessonsList /></Grid2>
-      </Grid2>
+        <Grid size={{xs:12, md: 4}}><VideoUpload /></Grid>
+        <Grid display={'flex'} size={{xs:12, md: 6}}><LessonQuizNotesTab /></Grid>
+        <Grid size={{xs:12, md: 2}}><LessonsList /></Grid>
+      </Grid>
 
       <LessonCreator />
     </>
