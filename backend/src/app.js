@@ -9,7 +9,8 @@ import {fileURLToPath} from 'node:url';
 import multer from 'multer';
 
 import {uploadVideo} from './upload.js';
-import * as lesson from './lesson.js'
+import * as lesson from './lesson.js';
+import * as ai from './ai.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,7 @@ app.use(cors({origin: 'http://localhost:3000'}));
 
 app.post('/api/v0/upload', upload.single('video'), uploadVideo);
 app.post('/api/v0/lesson', lesson.add);
+app.post('/api/v0/ai/gen', ai.generateLessonItems);
 app.get('/api/v0/lesson', lesson.getAll);
 app.get('/api/v0/lesson/:id', lesson.getLesson);
 

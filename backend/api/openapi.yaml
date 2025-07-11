@@ -134,6 +134,43 @@ paths:
           description: Lesson not found
         500:
           description: Internal server error
+  /ai/gen:
+    post:
+      summary: Generate lesson content sercurely using OpenAI
+      description: Accepts structured data (e.g. transcript and requestType) and constructs prompt server-side.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - transcript
+                - requestType
+              properties:
+                transcript:
+                  type: string
+                  description: Raw transcript to base the response on
+                requestType:
+                  type: string
+                  enum: [lessonPlan, quiz, notes]
+                  description: Type of AI output to Generate
+      responses:
+        200:
+          description: generated content from OpenAI
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  response:
+                    type: string
+        400:
+          description: bad input
+        500:
+          description: Server or OpenAI Error
 components:
   schemas:
     Error:
