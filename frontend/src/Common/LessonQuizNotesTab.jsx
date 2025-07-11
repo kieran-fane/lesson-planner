@@ -38,6 +38,7 @@ function LessonQuizNotesTabs() {
         body: JSON.stringify({transcript: transcriptText, requestType: 'lessonPlan'})
       });
       if (!quizResponse.ok || !notesResponse.ok || !lessonPlanResponse) throw new Error('Failed to save lesson');
+      // TODO - find a way to load new json objects to the editor.
       setQuiz(await quizResponse.json());
       setNotes(await notesResponse.json());
       setLessonPlan(await lessonPlanResponse.json());
