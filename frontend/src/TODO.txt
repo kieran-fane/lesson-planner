@@ -1,0 +1,4 @@
+// TODO - fix backend and frontend AI suite to only use 1 request per new creation.
+// TODO - fix so that when changes are made to lessonData it updates the backend with those changes as well.
+// TODO - fix preview after channging to new Lessons.
+// TODO - make sure switching lessons updates the UI.
