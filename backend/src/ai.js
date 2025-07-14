@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { zodTextFormat } from 'openai/helpers/zod';
-import { getLessonById } from './db.js';
+// import { getLessonById } from './db.js';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -30,11 +30,17 @@ const notesSchema = z.object({
 function getPrompt(tab, transcript) {
   switch (tab) {
     case 'lessonPlan':
-      return `Generate a lesson plan based on the transcript below. Return ONLY valid JSON matching this schema: title, objectives (array), summary, activities (array).\n\nTranscript:\n${transcript}`;
+      return `Generate a lesson plan based on the transcript below. 
+        Return ONLY valid JSON matching this schema: title, objectives
+        (array), summary, activities (array).\n\nTranscript:\n${transcript}`;
     case 'quiz':
-      return `Generate a multiple-choice quiz (5+ questions) from the transcript below. Return ONLY valid JSON matching this schema: [{ question, choices (4), answer }].\n\nTranscript:\n${transcript}`;
+      return `Generate a multiple-choice quiz (5+ questions) from the transcript below. 
+      Return ONLY valid JSON matching this schema: [{ question, choices (4), answer }].
+      \n\nTranscript:\n${transcript}`;
     case 'notes':
-      return `Generate fill-in-the-blank notes from the transcript below. Return ONLY valid JSON matching this schema: [ strings with '____' blanks about key ideas. ]\n\nTranscript:\n${transcript}`;
+      return `Generate fill-in-the-blank notes from the transcript below. 
+      Return ONLY valid JSON matching this schema: [ strings with '____' blanks about key ideas. ]
+      \n\nTranscript:\n${transcript}`;
     default:
       return null;
   }
@@ -91,6 +97,7 @@ export async function generateLessonItems(req, res) {
         format: zodTextFormat(schema, requestType),
       },
     });
+    console.log(response.output_parsed);
     return res.json({ success: true, requestType, content: response.output_parsed });
   } catch (err) {
     console.error('OpenAI parse error:', err);

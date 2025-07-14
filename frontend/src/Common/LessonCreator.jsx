@@ -40,7 +40,7 @@ function LessonCreator() {
       }
     }
     saveLesson();
-  }, [videoId, transcript, lessonData]);
+  }, [videoId, transcript]);
 
   return null; // No UI needed
 }
