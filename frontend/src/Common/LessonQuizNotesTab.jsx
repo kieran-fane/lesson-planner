@@ -19,24 +19,21 @@ export default function LessonQuizNotesTabs() {
   const fetchOpenAIContent = async (text) => {
     setIsLoading(true);
     try {
-      const types = ['lessonPlan', 'quiz', 'notes'];
-      const results = {};
-      for (const type of types) {
-        const res = await fetch('http://localhost:3010/api/v0/ai/gen', {
+      const res = await fetch('http://localhost:3010/api/v0/ai/gen', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ transcript: text, requestType: type }),
-        });
-        if (!res.ok) throw new Error(`${type} fetch failed`);
-        const json = await res.json();
-        // assume API returns { content: {...} }
-        results[type] = json.content;
-      }
-      setLessonData({
-        lessonPlanContent: results.lessonPlan,
-        quizContent: results.quiz,
-        notesContent: results.notes,
+          body: JSON.stringify({ transcript: text}),
       });
+      const json = await res.json();
+      console.log(json);
+      if (!res.ok) throw new Error(`AI fetch failed`);
+      setLessonData({
+        lessonPlanContent: json.content.lessonPlan,
+        quizContent: json.content.quiz,
+        notesContent: json.content.notes,
+      });
+      // console.log(`${JSON.stringify(json.content.quiz)} ${JSON.stringify(json.content.notes)} ${JSON.stringify(json.content)}`);
+      // console.log(`GenLesson: ${JSON.stringify(lessonData)}`);
     } catch (err) {
       console.error('AI fetch error:', err);
     } finally {

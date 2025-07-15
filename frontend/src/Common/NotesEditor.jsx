@@ -33,7 +33,7 @@ export default function NotesEditor() {
         notesContent: { notes },
       }));
     }
-  }, [notes, lessonData, setLessonData]);
+  }, [notes, lessonData]);
 
   const handleChange = (idx, val) => {
     const updated = [...notes];

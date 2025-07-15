@@ -21,7 +21,7 @@ export default function LessonPlanEditor() {
   const [summary, setSummary] = useState(aiPlan.summary);
   const [activities, setActivities] = useState(aiPlan.activities);
 
-  // Reset when AI content changes
+  // Reset local state when AI content changes
   useEffect(() => {
     setTitle(aiPlan.title || "");
     setObjectives(Array.isArray(aiPlan.objectives) ? aiPlan.objectives : []);
@@ -29,28 +29,38 @@ export default function LessonPlanEditor() {
     setActivities(Array.isArray(aiPlan.activities) ? aiPlan.activities : []);
   }, [aiPlan.title, aiPlan.objectives, aiPlan.summary, aiPlan.activities]);
 
-  // Sync back with guard and skip first render
+  // Sync back to lessonData: lessonPlanContent and top-level title
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
       return;
     }
-    // Only sync if lessonData exists and differs
-    const current = lessonData?.lessonPlanContent;
-    const next = { title, objectives, summary, activities };
-    if (!current || JSON.stringify(current) !== JSON.stringify(next)) {
-      setLessonData((prev) => ({
+
+    const nextPlan = { title, objectives, summary, activities };
+    const currentPlan = lessonData?.lessonPlanContent;
+
+    // Update lessonPlanContent if changed
+    if (!currentPlan || JSON.stringify(currentPlan) !== JSON.stringify(nextPlan)) {
+      setLessonData(prev => ({
         ...prev,
-        lessonPlanContent: next,
+        lessonPlanContent: nextPlan,
       }));
     }
-  }, [title, objectives, summary, activities, setLessonData, lessonData]);
 
-  // Handlers
-  const updateArrayItem = (arr, setArr, idx, value) => {
-    const updated = [...arr];
-    updated[idx] = value;
-    setArr(updated);
+    // Update top-level title if it differs
+    if (lessonData?.title !== title) {
+      setLessonData(prev => ({
+        ...prev,
+        title,
+      }));
+    }
+  }, [title, objectives, summary, activities, lessonData]);
+
+  // Array helpers
+  const updateArrayItem = (arr, setArr, idx, val) => {
+    const next = [...arr];
+    next[idx] = val;
+    setArr(next);
   };
   const deleteArrayItem = (arr, setArr, idx) => {
     setArr(arr.filter((_, i) => i !== idx));
@@ -65,7 +75,7 @@ export default function LessonPlanEditor() {
         fullWidth
         label="Lesson Title"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={e => setTitle(e.target.value)}
         sx={{ mb: 2 }}
       />
 
@@ -76,7 +86,7 @@ export default function LessonPlanEditor() {
             fullWidth
             size="small"
             value={obj}
-            onChange={(e) => updateArrayItem(objectives, setObjectives, idx, e.target.value)}
+            onChange={e => updateArrayItem(objectives, setObjectives, idx, e.target.value)}
           />
           <IconButton onClick={() => deleteArrayItem(objectives, setObjectives, idx)}>
             <DeleteIcon fontSize="small" />
@@ -93,7 +103,7 @@ export default function LessonPlanEditor() {
         rows={4}
         label="Summary"
         value={summary}
-        onChange={(e) => setSummary(e.target.value)}
+        onChange={e => setSummary(e.target.value)}
         sx={{ mb: 2 }}
       />
 
@@ -104,7 +114,7 @@ export default function LessonPlanEditor() {
             fullWidth
             size="small"
             value={act}
-            onChange={(e) => updateArrayItem(activities, setActivities, idx, e.target.value)}
+            onChange={e => updateArrayItem(activities, setActivities, idx, e.target.value)}
           />
           <IconButton onClick={() => deleteArrayItem(activities, setActivities, idx)}>
             <DeleteIcon fontSize="small" />

@@ -30,7 +30,7 @@ export default function QuizEditor() {
         quizContent: { questions },
       }));
     }
-  }, [questions, lessonData, setLessonData]);
+  }, [questions, lessonData]);
 
   const handleChange = (idx, field, value) => {
     const updated = [...questions];

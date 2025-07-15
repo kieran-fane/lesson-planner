@@ -7,40 +7,52 @@ import Context from '../appContext';
  */
 function LessonCreator() {
   const {videoFile, videoId, transcript,
-    lessonData, setLessons} = useContext(Context);
+    lessonData, setLessons, setLessonData} = useContext(Context);
   useEffect(() => {
     if (!videoId || !transcript || !lessonData) return;
 
-    /**
-     * Saves lesson to backend
-     */
-    async function saveLesson() {
+    async function saveOrUpdate() {
+      const payload = {
+        name: lessonData.title || `Lesson from ${videoFile?.name || 'file'}`,
+        videoId,
+        transcript,
+        lessonPlan: lessonData.lessonPlanContent,
+        quiz: lessonData.quizContent,
+        notes: lessonData.notesContent,
+      };
+
+      // Decide between create vs update
+      const url = lessonData.id
+        ? `http://localhost:3010/api/v0/lesson/${lessonData.id}`
+        : 'http://localhost:3010/api/v0/lesson';
+      const method = lessonData.id ? 'PUT' : 'POST';
+
       try {
-        // console.log('video file DATA: ', videoFile);
-        const lesson = {
-          name: `Lesson from ${videoFile.name}`,
-          videoId,
-          transcript,
-          ...lessonData,
-        };
-
-        const response = await fetch('http://localhost:3010/api/v0/lesson', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(lesson),
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
         });
+        if (!res.ok) throw new Error('Save failed');
 
-        if (!response.ok) throw new Error('Failed to save lesson');
-        const savedLesson = await response.json();
-        // Update lessons list with the new lesson
-        setLessons((prev) => [...prev, {id: savedLesson.lessonId,
-          data: lesson}]);
-      } catch (error) {
-        console.error('Error saving lesson:', error);
+        const result = await res.json();
+
+        // If we just created, update the id and list
+        if (!lessonData.id) {
+          setLessons((prev) => [
+            ...prev,
+            { id: result.lessonId, data: payload },
+          ]);
+          setLessonData((prev) => ({ ...prev, id: result.lessonId }));
+        }
+
+      } catch (err) {
+        console.error('Error saving/updating lesson:', err);
       }
     }
-    saveLesson();
-  }, [videoId, transcript]);
+
+    saveOrUpdate();
+  }, [videoId, transcript, lessonData]);
 
   return null; // No UI needed
 }
