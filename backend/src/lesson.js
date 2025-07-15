@@ -39,3 +39,30 @@ export async function getLesson(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
+/**
+ * Updates an existing lesson by ID
+ * @param {object} req request
+ * @param {object} res response
+ */
+export async function updateLesson(req, res) {
+  const { id } = req.params;
+  const { name, videoId, transcript, lessonPlanContent, quizContent, notesContent } = req.body;
+  try {
+    const updatedId = await db.updateLesson(
+      id,
+      name,
+      videoId,
+      transcript,
+      lessonPlanContent,
+      quizContent,
+      notesContent
+    );
+    if (!updatedId) {
+      return res.status(404).json({ success: false, error: 'Lesson not found' });
+    }
+    res.json({ success: true, lessonId: updatedId });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}

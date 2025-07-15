@@ -38,9 +38,11 @@ app.use(cors({origin: 'http://localhost:3000'}));
 
 app.post('/api/v0/upload', upload.single('video'), uploadVideo);
 app.post('/api/v0/lesson', lesson.add);
-app.post('/api/v0/ai/gen', ai.generateLessonItems);
+app.put('/api/v0/lesson/:id', lesson.updateLesson);
 app.get('/api/v0/lesson', lesson.getAll);
 app.get('/api/v0/lesson/:id', lesson.getLesson);
+
+app.post('/api/v0/ai/gen', ai.generateNewLesson);
 
 app.use(
   OpenApiValidator.middleware({

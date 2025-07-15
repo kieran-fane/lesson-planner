@@ -27,6 +27,27 @@ const notesSchema = z.object({
   notes: z.array(z.string()),
 });
 
+const lessonSchema = z.object({
+  lessonPlan: lessonPlanSchema, 
+  quiz: quizSchema, 
+  notes: notesSchema
+});
+
+function getNewGenPrompt(transcript) {
+  const newGenPrompt = `Generate a lesson, that will be comprized of 3 things, a lesson plan, a quiz, and fill-in-the-blank notes. 
+  Using the transcript below.
+  Retrun ONLY valid JSON with the following schema:\n\n 
+  lesson : {\n
+    lessonPlan: {title, objectives
+        (array), summary, activities (array)},\n
+    quiz: [{ question, choices (4), answer }],\n
+    notes: [ strings with '____' blanks about key ideas. ],\n
+  }\n\n
+  Transcript:\n${transcript}
+  `;
+  return newGenPrompt;
+}
+
 function getPrompt(tab, transcript) {
   switch (tab) {
     case 'lessonPlan':
@@ -55,14 +76,48 @@ function getSchema(tab) {
   }
 }
 
-export async function generateLessonItems(req, res) {
+export async function generateNewLesson(req, res) {
+  const { transcript } = req.body;
+
+  if (!transcript) {
+    return res.status(400).json({error: 'transcript is required'})
+  }
+
+  const prompt = getNewGenPrompt(transcript);
+
+  try {
+    const response = await openai.responses.parse({
+      model: 'gpt-4o-2024-08-06',
+      input: [
+        {
+          role: 'system',
+          content: `You are an educational assistant that returns ONLY structured JSON for a newly created lesson object.`,
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      text: {
+        format: zodTextFormat(lessonSchema, 'lesson'),
+      },
+    });
+    console.log(response.output_parsed);
+    return res.json({ success: true, content: response.output_parsed });
+  } catch (err) {
+    console.error('OpenAI parse error:', err);
+    return res.status(500).json({ error: 'Failed to generate content', details: err.message });
+  }
+}
+
+export async function generateLessonItem(req, res) {
   console.log(req.body);
   
   const { transcript, requestType } = req.body;
 
   if (!transcript || !requestType) {
     console.log('no lessonID');
-    return res.status(400).json({ error: "lessonID and tab are required" });
+    return res.status(400).json({ error: "transcript and tab are required" });
   }
 
   // const lesson = await getLessonById(lessonID);

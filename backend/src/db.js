@@ -34,6 +34,20 @@ export async function updateVideoWithTranscript(videoId, transcript) {
   await pool.query(query);
 }
 
+export async function updateLesson(lessonId, name, videoId, transcript, lessonPlan, quiz, notes) {
+  const lessonData = { name, transcript, lessonPlan, quiz, notes };
+  const query = {
+    text: `UPDATE lesson
+           SET video_id = $2,
+               data     = $3
+           WHERE id = $1
+           RETURNING id`,
+    values: [lessonId, videoId, lessonData],
+  };
+  const { rows } = await pool.query(query);
+  return rows[0]?.id;
+}
+
 export async function addLesson(name, videoId, transcript, lessonPlan, quiz, notes) {
   const lessonData = {
     name,
