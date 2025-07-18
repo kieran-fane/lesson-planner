@@ -102,8 +102,8 @@ export async function generateNewLesson(req, res) {
         format: zodTextFormat(lessonSchema, 'lesson'),
       },
     });
-    console.log(response.output_parsed);
-    return res.json({ success: true, content: response.output_parsed });
+    // console.log(response.output_parsed);
+    return res.status(201).json({ success: true, content: response.output_parsed });
   } catch (err) {
     console.error('OpenAI parse error:', err);
     return res.status(500).json({ error: 'Failed to generate content', details: err.message });
@@ -111,12 +111,9 @@ export async function generateNewLesson(req, res) {
 }
 
 export async function generateLessonItem(req, res) {
-  console.log(req.body);
-  
   const { transcript, requestType } = req.body;
 
   if (!transcript || !requestType) {
-    console.log('no lessonID');
     return res.status(400).json({ error: "transcript and tab are required" });
   }
 
@@ -131,7 +128,7 @@ export async function generateLessonItem(req, res) {
   const schema = getSchema(requestType);
 
   if (!prompt || !schema) {
-    console.log('wrong schema type');
+    // console.log('wrong schema type');
     return res.status(400).json({ error: "Invalid tab type" });
   }
 
@@ -152,8 +149,8 @@ export async function generateLessonItem(req, res) {
         format: zodTextFormat(schema, requestType),
       },
     });
-    console.log(response.output_parsed);
-    return res.json({ success: true, requestType, content: response.output_parsed });
+    // console.log(response.output_parsed);
+    return res.status(201).json({ success: true, requestType, content: response.output_parsed });
   } catch (err) {
     console.error('OpenAI parse error:', err);
     return res.status(500).json({ error: 'Failed to generate content', details: err.message });

@@ -5,35 +5,35 @@ import NotesEditor from './NotesEditor';
 import QuizEditor from './QuizEditor';
 import LessonPlanEditor from './LessonPlanEditor';
 
-/**
- * Renders tabs for Lesson Plan, Quiz, and Notes, fetching AI content and
- * syncing to global lessonData. Local states for loading are kept minimal.
- */
 export default function LessonQuizNotesTabs() {
   const [activeTab, setActiveTab] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   const { transcript, lessonData, setLessonData, fetchAI } = useContext(Context);
 
-  // Fetch AI-generated content and store directly in lessonData
   const fetchOpenAIContent = async (text) => {
+    if (!lessonData?.id) return; // Only update if lesson already exists
+
     setIsLoading(true);
     try {
       const res = await fetch('http://localhost:3010/api/v0/ai/gen', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ transcript: text}),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript: text }),
       });
+
       const json = await res.json();
-      console.log(json);
       if (!res.ok) throw new Error(`AI fetch failed`);
-      setLessonData({
+
+      // Only update the content, keep the existing id
+      setLessonData(prev => ({
+        ...prev,
+        title: json.content.lessonPlan?.title || prev.title,
         lessonPlanContent: json.content.lessonPlan,
         quizContent: json.content.quiz,
         notesContent: json.content.notes,
-      });
-      // console.log(`${JSON.stringify(json.content.quiz)} ${JSON.stringify(json.content.notes)} ${JSON.stringify(json.content)}`);
-      // console.log(`GenLesson: ${JSON.stringify(lessonData)}`);
+        transcript: text, // Redundant, but safe
+      }));
     } catch (err) {
       console.error('AI fetch error:', err);
     } finally {
@@ -41,12 +41,11 @@ export default function LessonQuizNotesTabs() {
     }
   };
 
-  // Trigger fetch when transcript is available
   useEffect(() => {
-    if (transcript && fetchAI) {
+    if (transcript && fetchAI && lessonData?.id) {
       fetchOpenAIContent(transcript);
     }
-  }, [transcript, fetchAI]);
+  }, [transcript, fetchAI, lessonData?.id]);
 
   const handleTabChange = (_, newValue) => {
     setActiveTab(newValue);
@@ -60,7 +59,7 @@ export default function LessonQuizNotesTabs() {
 
   return (
     <Paper sx={{ width: '100%', minWidth: '40vw', height: '100%', display: 'flex' }}>
-      <Box sx={{ width: '100%', mt: 2, margin: 0 }}>
+      <Box sx={{ width: '100%', mt: 2 }}>
         <Tabs value={activeTab} onChange={handleTabChange} centered>
           <Tab label="Lesson Plan" />
           <Tab label="Quiz" />

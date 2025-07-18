@@ -9,9 +9,8 @@ const transcribeScriptPath = path.resolve('src/transcribe.py');
  * Handles video upload & passes it directly to Whisper transcription.
  */
 export const uploadVideo = async (req, res) => {
-    // console.log('IN UPLOAD');
     if (!req.file) {
-        console.log('no file');
+        console.log('CRITICAL ! NO FILE UPLOADED');
         return res.status(400).json({ error: 'No video file provided' });
     }
 
@@ -42,7 +41,7 @@ export const uploadVideo = async (req, res) => {
             // Update JSONB with transcript
             await updateVideoWithTranscript(videoId, transcript);
 
-            res.json({success: true, videoId, transcript});
+            res.status(201).json({success: true, videoId, transcript});
             // console.log(res);
         });
 

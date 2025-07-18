@@ -3,34 +3,45 @@ import { Box, TextField, IconButton, Button, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Context from "../appContext";
 
+// Reusable debounce hook
+function useDebouncedEffect(callback, deps, delay) {
+  useEffect(() => {
+    const handler = setTimeout(() => callback(), delay);
+    return () => clearTimeout(handler);
+  }, [...deps, delay]);
+}
+
 export default function QuizEditor() {
   const { lessonData, setLessonData } = useContext(Context);
 
-  const aiQs = lessonData?.quizContent?.questions || [];
-  const initialQs = aiQs.length > 0
-    ? aiQs
+  const initialQs = lessonData?.quizContent?.questions?.length
+    ? lessonData.quizContent.questions
     : [{ question: "", choices: ["", "", "", ""], answer: "" }];
 
   const [questions, setQuestions] = useState(initialQs);
   const didMountRef = useRef(false);
 
+  // Reset on lesson switch
   useEffect(() => {
     setQuestions(initialQs);
-  }, [initialQs]);
+    didMountRef.current = false;
+  }, [lessonData?.id]);
 
-  useEffect(() => {
+  // Debounced update
+  useDebouncedEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
       return;
     }
-    const current = lessonData?.quizContent?.questions;
-    if (!current || JSON.stringify(current) !== JSON.stringify(questions)) {
+
+    const current = lessonData?.quizContent?.questions || [];
+    if (JSON.stringify(current) !== JSON.stringify(questions)) {
       setLessonData((prev) => ({
         ...prev,
         quizContent: { questions },
       }));
     }
-  }, [questions, lessonData]);
+  }, [questions], 500);
 
   const handleChange = (idx, field, value) => {
     const updated = [...questions];
@@ -43,7 +54,6 @@ export default function QuizEditor() {
   };
 
   const handleAdd = () => {
-    // default new question structure
     setQuestions([
       ...questions,
       { question: "", choices: ["", "", "", ""], answer: "" },

@@ -57,8 +57,6 @@ export async function addLesson(name, videoId, transcript, lessonPlan, quiz, not
     notes
   };
 
-  console.log('db: ', lessonData);
-
   const query = {
     text: `INSERT INTO lesson (video_id, data) VALUES ($1, $2) RETURNING id`,
     values: [videoId, lessonData],
@@ -82,4 +80,17 @@ export async function getLessonById(lessonId) {
 
   const { rows } = await pool.query(query);
   return rows.length ? rows[0] : null;
+}
+
+
+/**
+ * Fetch the stored video blob + metadata for streaming
+ */
+export async function getVideoById(id) {
+  const query = {
+    text: `SELECT data FROM video WHERE id = $1`,
+    values: [id],
+  };
+  const { rows } = await pool.query(query);
+  return rows.length ? rows[0].data : null;
 }

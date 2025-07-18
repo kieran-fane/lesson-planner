@@ -9,6 +9,7 @@ import {fileURLToPath} from 'node:url';
 import multer from 'multer';
 
 import {uploadVideo} from './upload.js';
+import * as video from './video.js';
 import * as lesson from './lesson.js';
 import * as ai from './ai.js';
 
@@ -37,6 +38,7 @@ app.use('/api/v0/docs', swaggerUi.serve, swaggerUi.setup(apidoc));
 app.use(cors({origin: 'http://localhost:3000'}));
 
 app.post('/api/v0/upload', upload.single('video'), uploadVideo);
+app.get('/api/v0/video/:id', video.getVideo);
 app.post('/api/v0/lesson', lesson.add);
 app.put('/api/v0/lesson/:id', lesson.updateLesson);
 app.get('/api/v0/lesson', lesson.getAll);
@@ -53,7 +55,7 @@ app.use(
 );
 
 app.use((err, req, res, next) => {
-  res.status(err.status).json({
+  res.status(err.status || 500).json({
     code: err.status || 500,
     message: err.message,
     errors: err.errors,

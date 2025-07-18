@@ -44,6 +44,42 @@ paths:
           description: Internal server error (processing failed).
         default:
           description: Unexpected error.
+  /video/{id}:
+    get:
+      summary: Get a specific lesson by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns the lesson data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  videoId:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      lessonPlan:
+                        type: string
+                      quiz:
+                        type: string
+                      notes:
+                        type: string
+        404:
+          description: Lesson not found
+        500:
+          description: Internal server error
   /lesson:
     post:
       summary: Add a new lesson

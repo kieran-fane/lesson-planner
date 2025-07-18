@@ -3,68 +3,73 @@ import { Box, TextField, IconButton, Button, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Context from "../appContext";
 
+// Custom debounce effect
+function useDebouncedEffect(callback, deps, delay) {
+  useEffect(() => {
+    const handler = setTimeout(() => callback(), delay);
+    return () => clearTimeout(handler);
+  }, [...deps, delay]);
+}
+
 export default function LessonPlanEditor() {
   const { lessonData, setLessonData } = useContext(Context);
   const didMountRef = useRef(false);
 
-  // AI-generated plan or defaults
   const aiPlan = lessonData?.lessonPlanContent || {
     title: "",
     objectives: [],
     summary: "",
-    activities: []
+    activities: [],
   };
 
-  // Local state
   const [title, setTitle] = useState(aiPlan.title);
   const [objectives, setObjectives] = useState(aiPlan.objectives);
   const [summary, setSummary] = useState(aiPlan.summary);
   const [activities, setActivities] = useState(aiPlan.activities);
 
-  // Reset local state when AI content changes
+  // Reset local state when switching lessons
   useEffect(() => {
     setTitle(aiPlan.title || "");
     setObjectives(Array.isArray(aiPlan.objectives) ? aiPlan.objectives : []);
     setSummary(aiPlan.summary || "");
     setActivities(Array.isArray(aiPlan.activities) ? aiPlan.activities : []);
-  }, [aiPlan.title, aiPlan.objectives, aiPlan.summary, aiPlan.activities]);
+    didMountRef.current = false;
+  }, [lessonData?.id]); // Only reset on lesson change
 
-  // Sync back to lessonData: lessonPlanContent and top-level title
-  useEffect(() => {
+  // Debounced sync to lessonData
+  useDebouncedEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
       return;
     }
 
     const nextPlan = { title, objectives, summary, activities };
-    const currentPlan = lessonData?.lessonPlanContent;
+    const currentPlan = lessonData?.lessonPlanContent || {};
 
-    // Update lessonPlanContent if changed
-    if (!currentPlan || JSON.stringify(currentPlan) !== JSON.stringify(nextPlan)) {
+    const contentChanged =
+      JSON.stringify(currentPlan) !== JSON.stringify(nextPlan);
+    const titleChanged = lessonData?.title !== title;
+
+    if (contentChanged || titleChanged) {
       setLessonData(prev => ({
         ...prev,
         lessonPlanContent: nextPlan,
-      }));
-    }
-
-    // Update top-level title if it differs
-    if (lessonData?.title !== title) {
-      setLessonData(prev => ({
-        ...prev,
         title,
       }));
     }
-  }, [title, objectives, summary, activities, lessonData]);
+  }, [title, objectives, summary, activities], 500); // debounce 500ms
 
-  // Array helpers
+  // Helpers
   const updateArrayItem = (arr, setArr, idx, val) => {
     const next = [...arr];
     next[idx] = val;
     setArr(next);
   };
+
   const deleteArrayItem = (arr, setArr, idx) => {
     setArr(arr.filter((_, i) => i !== idx));
   };
+
   const addArrayItem = (arr, setArr, defaultVal = "") => {
     setArr([...arr, defaultVal]);
   };
