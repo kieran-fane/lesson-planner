@@ -44,6 +44,42 @@ paths:
           description: Internal server error (processing failed).
         default:
           description: Unexpected error.
+  /video/{id}:
+    get:
+      summary: Get a specific lesson by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns the lesson data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  videoId:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      lessonPlan:
+                        type: string
+                      quiz:
+                        type: string
+                      notes:
+                        type: string
+        404:
+          description: Lesson not found
+        500:
+          description: Internal server error
   /lesson:
     post:
       summary: Add a new lesson
@@ -99,7 +135,7 @@ paths:
         500:
           description: Internal server error
   /lesson/{id}:
-   get:
+    get:
       summary: Get a specific lesson by ID
       parameters:
         - name: id
@@ -134,6 +170,72 @@ paths:
           description: Lesson not found
         500:
           description: Internal server error
+    put:
+      summary: Update an existing lesson by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LessonInput'
+      responses:
+        '200':
+          description: Lesson updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  lessonId:
+                    type: string
+        '404':
+          description: Lesson not found
+        '500':
+          $ref: '#/components/schemas/Error'
+  /ai/gen:
+    post:
+      summary: Generate lesson content sercurely using OpenAI
+      description: Accepts structured data (e.g. transcript and requestType) and constructs prompt server-side.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - transcript
+              properties:
+                transcript:
+                  type: string
+                  description: Raw transcript to base the response on
+                requestType:
+                  type: string
+                  enum: [lessonPlan, quiz, notes]
+                  description: Type of AI output to Generate
+      responses:
+        200:
+          description: generated content from OpenAI
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  response:
+                    type: string
+        400:
+          description: bad input
+        500:
+          description: Server or OpenAI Error
 components:
   schemas:
     Error:

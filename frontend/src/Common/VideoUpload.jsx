@@ -1,131 +1,202 @@
-import React, {useEffect, useState} from 'react';
-import {useDropzone} from 'react-dropzone';
-import {Card, CardContent, Typography,
+import React, { useEffect, useState, useContext, useCallback, useRef } from 'react';
+import { useDropzone } from 'react-dropzone';
+import {
+  Card,
+  CardContent,
+  Typography,
   Box,
   CardMedia,
-  Paper, CircularProgress} from '@mui/material';
-import {styled} from '@mui/material/styles';
+  Paper,
+  CircularProgress
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Context from '../appContext';
-import {transcribeVideoFile} from '../util/transcribe.js';
+import { transcribeVideoFile } from '../util/transcribe.js';
 
 const FileInput = styled('input')({
   display: 'none',
 });
 
-/**
- * Creates the video upload component
- * @returns {object} JSX
- */
-function VideoUpload() {
-  const {videoFile, setVideoFile, setTranscriptLoading, setFetchAI,
-    transcript, setTranscript, transcriptLoading, videoId, setVideoId,
-  } = React.useContext(Context);
+export default function VideoUpload() {
+  const {
+    videoFile,
+    setVideoFile,
+    setTranscriptLoading,
+    setFetchAI,
+    transcript,
+    setTranscript,
+    transcriptLoading,
+    videoId,
+    setVideoId,
+    setLessonData,
+    setLessons
+  } = useContext(Context);
 
   const [previewURL, setPreviewURL] = useState(null);
+  const videoRef = useRef(null);
 
+  // Manage preview URL: BACKEND URL takes priority every time
   useEffect(() => {
-    if (videoFile?.previewURL) {
+    if (videoId) {
+      // always point at the backend for playback
+      setPreviewURL(`http://localhost:3010/api/v0/video/${videoId}`);
+    } else if (videoFile?.previewURL) {
+      // fallback to local object URL on initial upload
       setPreviewURL(videoFile.previewURL);
-    } else if (videoId) {
-      setPreviewURL(`http://localhost:3010/api/v0/videos/${videoId}`); // Load from backend
     } else {
       setPreviewURL(null);
     }
   }, [videoFile, videoId]);
 
-  // onDrop callback for react-dropzone
-  const onDrop = React.useCallback((acceptedFiles) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-
-      // Create a local preview URL and store it inside videoFile
-      setVideoFile({
-        file, // Preserve original file attributes
-        name: file.name,
-        previewURL: URL.createObjectURL(file),
-        // Store preview URL inside the object
-      });
-      setVideoId(null);
-
-      transcribeVideoFile(file,
-          {
-            setTranscriptLoading,
-            setVideoId,
-            setTranscript,
-            setFetchAI,
-          });
+  // Force video to reload when src changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
     }
-  }, []);
+  }, [previewURL]);
 
-  React.useEffect(() => {
+  // onDrop callback
+  const onDrop = useCallback(async (acceptedFiles) => {
+    if (!acceptedFiles.length) return;
+    const file = acceptedFiles[0];
+    const name = file.name;
+
+    // 1) Immediate local preview
+    const localURL = URL.createObjectURL(file);
+    setVideoFile({ file, name, previewURL: localURL });
+    setVideoId(null);
+    setTranscript('');
+    setFetchAI(false);
+
+    // 2) Create placeholder lesson in the DB
+    try {
+      const placeholder = {
+        name: `Lesson from ${name}`,
+        videoId: null,
+        transcript: '',
+        lessonPlan: null,
+        quiz: null,
+        notes: null,
+      };
+
+      const res = await fetch('http://localhost:3010/api/v0/lesson', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(placeholder),
+      });
+      if (!res.ok) throw new Error('Failed to create placeholder');
+      const { lessonId } = await res.json();
+
+      setLessonData({
+        id: lessonId,
+        title: placeholder.name,
+        lessonPlanContent: null,
+        quizContent: null,
+        notesContent: null,
+        transcript: '',
+      });
+      setLessons(prev => [
+        ...prev,
+        { id: lessonId, data: { name: placeholder.name } }
+      ]);
+    } catch (err) {
+      console.error('Error creating placeholder lesson:', err);
+    }
+
+    // 3) Kick off transcription & AI pipeline
+    transcribeVideoFile(file, {
+      setTranscriptLoading,
+      setVideoId,
+      setTranscript,
+      setFetchAI,
+    });
+  }, [
+    setVideoFile,
+    setVideoId,
+    setTranscript,
+    setFetchAI,
+    setTranscriptLoading,
+    setLessonData,
+    setLessons,
+  ]);
+
+  // Cleanup local object URL when component unmounts or file changes
+  useEffect(() => {
     return () => {
       if (videoFile?.previewURL) {
         URL.revokeObjectURL(videoFile.previewURL);
       }
     };
   }, [videoFile]);
-  // react-dropzone hooks
-  const {getRootProps, getInputProps, isDragActive} = useDropzone({
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    // Limit to video files only
-    accept: {
-      'video/*': [],
-    },
-    multiple: false, // Set to false for single-file upload
+    accept: { 'video/*': [] },
+    multiple: false,
   });
 
   return (
-    <Card sx={{// width: '40vw',
-      boxShadow: 3,
-      borderRadius: 2,
-      height: '100%'}}>
+    <Card sx={{ boxShadow: 3, borderRadius: 2, height: '100%' }}>
       <CardContent>
-        <Typography variant="h5" component="div" gutterBottom>
+        <Typography variant="h5" gutterBottom>
           Upload a Video
         </Typography>
-        {videoFile ? (
+
+        {videoFile || videoId ? (
           <Box mt={2}>
             <Typography variant="body1">
-              Selected File: {videoFile.name}
+              Selected File: {videoFile?.name}
             </Typography>
             <CardMedia
               component="video"
               controls
-              src={previewURL} // Use preview URL from the object
-              sx={{mt: 2, maxHeight: 300, objectFit: 'cover'}}
+              src={previewURL}
+              ref={videoRef}
+              sx={{ mt: 2, maxHeight: 300, objectFit: 'cover' }}
             />
           </Box>
         ) : (
           <Paper
             {...getRootProps()}
             variant="outlined"
-            sx={{p: 2,
+            sx={{
+              p: 2,
               textAlign: 'center',
-              mt: 2, cursor: 'pointer',
-              border: '2px dashed #ccc'}}
+              mt: 2,
+              cursor: 'pointer',
+              border: '2px dashed #ccc'
+            }}
           >
             <FileInput {...getInputProps()} />
             <Typography>
-              {isDragActive ? 'Drop your video file here ...' :
-              'Drag & drop a video, or click to select a file'}
+              {isDragActive
+                ? 'Drop your video file here ...'
+                : 'Drag & drop a video, or click to select a file'}
             </Typography>
           </Paper>
         )}
-        {/* Transcript Section */}
+
         <Box mt={2}>
-          <Typography variant="h6" gutterBottom>Transcript</Typography>
-          <Paper sx={{height: '35vh',
-            overflowY: 'auto', p: 2,
-            border: '1px solid #ccc'}}>
+          <Typography variant="h6" gutterBottom>
+            Transcript
+          </Typography>
+          <Paper sx={{ height: '35vh', overflowY: 'auto', p: 2, border: '1px solid #ccc' }}>
             {transcriptLoading ? (
-              <Box sx={{display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center', height: '100%'}}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%'
+                }}
+              >
                 <CircularProgress />
               </Box>
             ) : (
-              <Typography variant="body2"
-                sx={{whiteSpace: 'pre-wrap', wordBreak: 'break-word'}}>
+              <Typography
+                variant="body2"
+                sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+              >
                 {transcript}
               </Typography>
             )}
@@ -135,5 +206,3 @@ function VideoUpload() {
     </Card>
   );
 }
-
-export default VideoUpload;

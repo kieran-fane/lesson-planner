@@ -1,3 +1,4 @@
+import { ChatCompletionStreamingRunner } from 'openai/lib/ChatCompletionStreamingRunner.mjs';
 import * as db from './db.js';
 
 /**
@@ -34,8 +35,38 @@ export async function getLesson(req, res) {
     if (!lesson) {
       return res.status(404).json({ error: 'Lesson not found' });
     }
-    res.json({ success: true, lesson });
+    res.status(200).json({ success: true, lesson });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+  // console.log('get lesson');
+}
+
+/**
+ * Updates an existing lesson by ID
+ * @param {object} req request
+ * @param {object} res response
+ */
+export async function updateLesson(req, res) {
+  const { id } = req.params;
+  // console.log(`update request`);
+  const { name, videoId, transcript, lessonPlan, quiz, notes } = req.body;
+  try {
+    const updatedId = await db.updateLesson(
+      id,
+      name,
+      videoId,
+      transcript,
+      lessonPlan,
+      quiz,
+      notes
+    );
+    if (!updatedId) {
+      return res.status(404).json({ success: false, error: 'Lesson not found' });
+    }
+    // console.log(`lesson.js: \t`, await db.getLessonById(updatedId));
+    res.status(201).json({ success: true, lessonId: updatedId });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 }

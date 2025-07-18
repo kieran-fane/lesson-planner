@@ -10,13 +10,13 @@
     "@vitest/coverage-v8": "*",
     "eslint": "*",
     "eslint-config-google": "*",
-    "eslint-plugin-jsdoc": "*", 
+    "eslint-plugin-jsdoc": "*",
     "globals": "8",
     "nodemon": "*",
     "strip-comments": "*",
     "supertest": "*",
-    "vitest": "*",
-    "vite-plugin-eslint": "*"
+    "vite-plugin-eslint": "*",
+    "vitest": "*"
   },
   "dependencies": {
     "cors": "*",
@@ -25,8 +25,10 @@
     "express-openapi-validator": "*",
     "js-yaml": "*",
     "jsonwebtoken": "*",
+    "openai": "^5.9.0",
     "pg": "*",
-    "swagger-ui-express": "*"
+    "swagger-ui-express": "*",
+    "zod": "^3.25.76"
   },
   "scripts": {
     "lint": "eslint src test --no-inline-config --max-warnings 0",

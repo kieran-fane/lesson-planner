@@ -34,6 +34,20 @@ export async function updateVideoWithTranscript(videoId, transcript) {
   await pool.query(query);
 }
 
+export async function updateLesson(lessonId, name, videoId, transcript, lessonPlan, quiz, notes) {
+  const lessonData = { name, transcript, lessonPlan, quiz, notes };
+  const query = {
+    text: `UPDATE lesson
+           SET video_id = $2,
+               data     = $3
+           WHERE id = $1
+           RETURNING id`,
+    values: [lessonId, videoId, lessonData],
+  };
+  const { rows } = await pool.query(query);
+  return rows[0]?.id;
+}
+
 export async function addLesson(name, videoId, transcript, lessonPlan, quiz, notes) {
   const lessonData = {
     name,
@@ -42,8 +56,6 @@ export async function addLesson(name, videoId, transcript, lessonPlan, quiz, not
     quiz,
     notes
   };
-
-  console.log('db: ', lessonData);
 
   const query = {
     text: `INSERT INTO lesson (video_id, data) VALUES ($1, $2) RETURNING id`,
@@ -68,4 +80,17 @@ export async function getLessonById(lessonId) {
 
   const { rows } = await pool.query(query);
   return rows.length ? rows[0] : null;
+}
+
+
+/**
+ * Fetch the stored video blob + metadata for streaming
+ */
+export async function getVideoById(id) {
+  const query = {
+    text: `SELECT data FROM video WHERE id = $1`,
+    values: [id],
+  };
+  const { rows } = await pool.query(query);
+  return rows.length ? rows[0].data : null;
 }
