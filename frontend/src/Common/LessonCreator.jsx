@@ -57,7 +57,6 @@ function LessonCreator() {
       };
 
       const updateLesson = async () => {
-        console.log('In Update');
         try {
           const res = await fetch(`http://localhost:3010/api/v0/lesson/${lessonData.id}`, {
             method: 'PUT',
@@ -65,7 +64,6 @@ function LessonCreator() {
             body: JSON.stringify(payload),
           });
           if (!res.ok) throw new Error('Update failed');
-          console.log('Lesson updated');
         } catch (err) {
           console.error('Error updating lesson:', err);
         }
