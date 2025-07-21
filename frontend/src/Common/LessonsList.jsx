@@ -55,7 +55,7 @@ function LessonsList() {
       const { lesson: lR } = await res.json();
 
       // set the videoId so VideoUpload can fall back on it…
-      console.log(JSON.stringify(lR));
+      // console.log(JSON.stringify(lR));
       setVideoId(lR.videoId);
 
       // …and also shove the previewURL into videoFile so we get it immediately

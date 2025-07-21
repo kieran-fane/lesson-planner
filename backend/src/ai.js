@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { z } from 'zod';
-import { zodTextFormat } from 'openai/helpers/zod';
+import { zodResponseFormat } from 'openai/helpers/zod';
 // import { getLessonById } from './db.js';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -83,27 +83,25 @@ export async function generateNewLesson(req, res) {
     return res.status(400).json({error: 'transcript is required'})
   }
 
-  const prompt = getNewGenPrompt(transcript);
-
+  const lessonWrapper = z.object({ lesson: lessonSchema });
+  const responseFormat = zodResponseFormat(lessonWrapper, "lesson");
   try {
-    const response = await openai.responses.parse({
+    const completion = await openai.chat.completions.parse({
       model: 'gpt-4o-2024-08-06',
-      input: [
+      messages: [
         {
           role: 'system',
           content: `You are an educational assistant that returns ONLY structured JSON for a newly created lesson object.`,
         },
         {
           role: 'user',
-          content: prompt,
+          content: getNewGenPrompt(transcript),
         },
       ],
-      text: {
-        format: zodTextFormat(lessonSchema, 'lesson'),
-      },
+      response_format: responseFormat,
     });
-    // console.log(response.output_parsed);
-    return res.status(201).json({ success: true, content: response.output_parsed });
+    const parsed = completion.choices[0].message.parsed;
+    return res.status(201).json({ success: true, content: parsed });
   } catch (err) {
     console.error('OpenAI parse error:', err);
     return res.status(500).json({ error: 'Failed to generate content', details: err.message });
@@ -128,7 +126,6 @@ export async function generateLessonItem(req, res) {
   const schema = getSchema(requestType);
 
   if (!prompt || !schema) {
-    // console.log('wrong schema type');
     return res.status(400).json({ error: "Invalid tab type" });
   }
 
@@ -149,7 +146,6 @@ export async function generateLessonItem(req, res) {
         format: zodTextFormat(schema, requestType),
       },
     });
-    // console.log(response.output_parsed);
     return res.status(201).json({ success: true, requestType, content: response.output_parsed });
   } catch (err) {
     console.error('OpenAI parse error:', err);

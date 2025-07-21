@@ -28,10 +28,10 @@ export default function LessonQuizNotesTabs() {
       // Only update the content, keep the existing id
       setLessonData(prev => ({
         ...prev,
-        title: json.content.lessonPlan?.title || prev.title,
-        lessonPlanContent: json.content.lessonPlan,
-        quizContent: json.content.quiz,
-        notesContent: json.content.notes,
+        title: json.content.lesson.lessonPlan?.title || prev.title,
+        lessonPlanContent: json.content.lesson.lessonPlan,
+        quizContent: json.content.lesson.quiz,
+        notesContent: json.content.lesson.notes,
         transcript: text, // Redundant, but safe
       }));
     } catch (err) {
